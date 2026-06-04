@@ -62,7 +62,9 @@ with mlflow.start_run(run_name=f"rf-depth-{max_depth}"):
     # record WHICH data fed this run (the data-lineage touch)
     # NB: the tracking server dedupes datasets by (name, digest) and keeps the
     # FIRST source it saw -- so put the commit in the name to get a fresh record.
-    dataset = mlflow.data.from_pandas(df, source=DATA_URI, name=f"churn@{COMMIT[:8]}", targets="churned")
+    # point the source at the CSV file (not the prefix) so the lakeFS URI links
+    # straight to the object viewer and its DuckDB query panel.
+    dataset = mlflow.data.from_pandas(df, source=f"{DATA_URI}churn.csv", name=f"churn@{COMMIT[:8]}", targets="churned")
     mlflow.log_input(dataset, context="training")
 
     # the settings we chose
